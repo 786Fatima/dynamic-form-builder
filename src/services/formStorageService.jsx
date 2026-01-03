@@ -224,21 +224,23 @@ const useFormStore = create(
       },
 
       // Load form by ID
-      loadForm: (formId) => {
-        set((state) => {
-          const form = state.forms.find((f) => f.id === formId);
+      getFormById: (formId) => {
+        set(() => {
+          const form =
+            loadFormsFromStorage().find((f) => f.id === formId) || {};
           return { currentForm: form || null };
         });
       },
 
       updateForm: ({ id = null, form }) => {
+        let updatedForm = null;
         set((state) => {
           if (!id || !state.currentForm) return state;
 
           const formDetails =
             loadFormsFromStorage().find((f) => f.id === id) || {};
 
-          const updatedForm = {
+          updatedForm = {
             ...formDetails,
             ...form,
             updatedAt: new Date().toISOString(),
@@ -255,6 +257,8 @@ const useFormStore = create(
             currentForm: updatedForm,
           };
         });
+
+        return { form: updatedForm, success: Boolean(updatedForm) };
       },
 
       // // Publish form

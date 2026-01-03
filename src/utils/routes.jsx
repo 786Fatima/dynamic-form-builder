@@ -8,5 +8,5 @@ export const ROUTE_LIST = {
   DASHBOARD: "/dashboard",
   CREATE_FORM: "/forms/create",
   FORM_LIST: "/forms",
-  PREVIEW_FORM: `/forms/preview/:${PARAM_LIST.formId}`,
+  PREVIEW_FORM: "/forms/preview",
 };

@@ -11,21 +11,24 @@ function AppButton({
 }) {
   const variants = {
     primary:
-      "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500",
+      "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 focus:ring-purple-300",
     secondary:
-      "bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500",
-    error: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
+      "bg-gray-100 text-gray-800 hover:bg-gray-200 focus:ring-gray-200",
+    error:
+      "bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 focus:ring-red-300",
   };
+
   const sizes = {
-    small: "px-3 py-1 text-sm",
-    medium: "px-4 py-2 text-base",
-    large: "px-5 py-3 text-lg",
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-sm md:text-base",
+    large: "px-5 py-3 text-base md:text-lg",
   };
+
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`${sizes[size]} ${variants[variant]} rounded-md focus:outline-none focus:ring-2 ${className}`}
+      className={`inline-flex items-center justify-center gap-2 ${sizes[size]} ${variants[variant]} rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 shadow-sm transition transform hover:-translate-y-0.5 ${className}`}
       {...props}
     >
       {children}
