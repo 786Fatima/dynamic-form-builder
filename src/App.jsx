@@ -1,35 +1,93 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+// Admin Pages
+// import Login from "./pages/Login";
+// import Register from "./pages/Register";
+import Compose from "./pages/Compose";
+import Dashboard from "./pages/Dashboard";
+import Feedbacks from "./pages/Feedbacks";
+import UserDetail from "./pages/UserDetail";
+import Users from "./pages/Users";
+
+// User Pages
+
+// Admin Components
+import Breadcrumbs from "./components/Breadcrumbs";
+import Sidebar from "./components/Sidebar";
+
+// User Components
+
+import LoadingSpinner from "./components/LoadingSpinner";
+import useStore from "./store";
+import { ROUTE_LIST } from "./utils/routes";
+
+export default function App() {
+  const location = useLocation();
+  const { isAuthenticated, isLoading, fetchData } = useStore();
+
+  const { DASHBOARD, FORM_LIST, CREATE_FORM, PREVIEW_FORM, LOGIN } = ROUTE_LIST;
+
+  // Check if current route is admin route
+  const isAdminRoute =
+    location.pathname.startsWith("/admin") ||
+    location.pathname === "/login" ||
+    location.pathname === "/register";
+
+  useEffect(() => {
+    // Fetch initial data
+    const loadData = async () => {
+      await Promise.all([
+        fetchData("users"),
+        fetchData("posts"),
+        fetchData("tags"),
+        fetchData("interactions"),
+        fetchData("comments"),
+      ]);
+    };
+    loadData();
+  }, [fetchData]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar />
+      <main className="flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto">
+          <div className="p-6">
+            <Breadcrumbs />
+            <Routes>
+              {/* <Route
+                path="/login"
+                element={<Navigate to="/admin/dashboard" />}
+              />
+              <Route
+                path="/register"
+                element={<Navigate to="/admin/dashboard" />}
+              /> */}
 
-export default App
+              <Route path={DASHBOARD} element={<Dashboard />} />
+              <Route path={CREATE_FORM} element={<Compose />} />
+              <Route path={FORM_LIST} element={<Users />} />
+              <Route path={PREVIEW_FORM} element={<UserDetail />} />
+              <Route path="/admin/feedbacks" element={<Feedbacks />} />
+            </Routes>
+          </div>
+        </div>
+      </main>
+      <LoadingSpinner isLoading={isLoading} />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </div>
+  );
+}
