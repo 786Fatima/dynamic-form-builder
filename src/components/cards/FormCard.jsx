@@ -1,19 +1,7 @@
-import { useState, useRef, useEffect } from "react";
-import {
-  FiEdit,
-  FiMoreHorizontal,
-  FiPower,
-  FiTrash2,
-  FiEye,
-} from "react-icons/fi";
+import { useEffect, useRef, useState } from "react";
+import { FiEdit, FiEye, FiMoreHorizontal, FiTrash2 } from "react-icons/fi";
 
-export default function FormCard({
-  form,
-  onEdit,
-  onDelete,
-  onToggleStatus,
-  onPreview,
-}) {
+export default function FormCard({ form, onEdit, onDelete, onPreview }) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
@@ -34,17 +22,12 @@ export default function FormCard({
   }, [showMenu]);
 
   const handleEdit = () => {
-    onEdit(form);
+    onEdit(form.id);
     setShowMenu(false);
   };
 
   const handleDelete = () => {
     onDelete(form.id);
-    setShowMenu(false);
-  };
-
-  const handleToggleStatus = () => {
-    onToggleStatus(form.id);
     setShowMenu(false);
   };
 
@@ -90,13 +73,6 @@ export default function FormCard({
                   <span>Edit</span>
                 </button>
                 <button
-                  onClick={handleToggleStatus}
-                  className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-blue-50 flex items-center space-x-3 transition-colors border-b border-gray-100"
-                >
-                  <FiPower className="w-4 h-4" />
-                  <span>{form.isActive ? "Disable" : "Enable"}</span>
-                </button>
-                <button
                   onClick={handleDelete}
                   className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-3 transition-colors"
                 >
@@ -114,7 +90,7 @@ export default function FormCard({
             (form.description.length > 100 ? "..." : "")}
         </p>
 
-        {/* Fields Tags */}
+        {/* Fields */}
         {form.fields && form.fields.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
             {form.fields.slice(0, 2).map((field) => (

@@ -3,10 +3,10 @@ export const PARAM_LIST = {
 };
 
 export const ROUTE_LIST = {
-  LOGIN: "/login",
-  REGISTER: "/register",
+  HOME: "/",
   DASHBOARD: "/dashboard",
   CREATE_FORM: "/forms/create",
+  EDIT_FORM: "/forms/edit",
   FORM_LIST: "/forms",
   PREVIEW_FORM: "/forms/preview",
 };

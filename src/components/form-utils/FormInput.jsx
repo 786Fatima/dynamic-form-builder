@@ -4,6 +4,8 @@ function FormInput({
   name = "",
   label = "",
   placeholder = "",
+  className = "",
+  wrapperClassName = "",
   type = "text",
   errors = { isError: false, message: "" },
   register = () => {},
@@ -26,29 +28,17 @@ function FormInput({
           className="w-5 h-5 rounded-md text-indigo-600 border-gray-300"
           {...props}
         />
-        <span className="text-sm text-gray-700">{label}</span>
+        <span className="text-xs md:text-sm text-gray-700">{label}</span>
       </label>
     );
   }
 
-  if (props.type === "select") {
-    return (
-      <select {...props}>
-        {props.options &&
-          props.options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-      </select>
-    );
-  }
   return (
-    <div>
+    <div className={`${wrapperClassName} col-span-2 md:col-span-1 mb-2`}>
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm font-semibold text-gray-700 mb-2"
+          className="block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2"
         >
           {label}
         </label>
@@ -57,7 +47,7 @@ function FormInput({
       {type === "select" && (
         <select
           {...register(name)}
-          className={`${inputBase} ${errorClasses}`}
+          className={`${inputBase} ${errorClasses}  text-xs md:text-sm`}
           {...props}
         >
           {options && options.length > 0
@@ -74,7 +64,7 @@ function FormInput({
         <textarea
           rows="6"
           {...register(name)}
-          className={`${inputBase} ${errorClasses} min-h-[120px]`}
+          className={`${inputBase} ${errorClasses} ${className} text-xs md:text-sm min-h-[120px]`}
           placeholder={placeholder}
           {...props}
         />
@@ -84,14 +74,16 @@ function FormInput({
         <input
           type={type}
           {...register(name)}
-          className={`${inputBase} ${errorClasses}`}
+          className={`${inputBase} ${errorClasses} ${className} text-xs md:text-sm`}
           placeholder={placeholder}
           {...props}
         />
       )}
 
       {errors?.isError && (
-        <p className="mt-1 text-sm text-red-500">{errors?.message}</p>
+        <p className="mt-1  text-xs md:text-sm text-red-500">
+          {errors?.message}
+        </p>
       )}
     </div>
   );

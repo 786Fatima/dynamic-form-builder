@@ -223,34 +223,56 @@ const useFormStore = create(
         return { form: createdForm, success: Boolean(createdForm) };
       },
 
-      // Load form by ID
+      // Get form by ID (pure getter — doesn't modify store)
       getFormById: (formId) => {
-        set(() => {
-          const form =
-            loadFormsFromStorage().find((f) => f.id === formId) || {};
-          return { currentForm: form || null };
-        });
+        // Try to find form in in-memory store first
+        const inMemory = get().forms.find((f) => f.id === formId);
+        if (inMemory) return inMemory;
+
+        // Fallback: try persisted storage (persist middleware stores under { state: { forms: [...] } })
+        try {
+          const raw = localStorage.getItem(FORMS_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const persistedForms = parsed?.state?.forms ?? parsed ?? [];
+            const form = Array.isArray(persistedForms)
+              ? persistedForms.find((f) => f.id === formId)
+              : undefined;
+            return form ?? null;
+          }
+        } catch (error) {
+          console.error("Error reading persisted forms:", error);
+        }
+
+        return null;
       },
 
       updateForm: ({ id = null, form }) => {
         let updatedForm = null;
+        if (!id) return { form: null, success: false };
+
         set((state) => {
-          if (!id || !state.currentForm) return state;
+          const idx = state.forms.findIndex((f) => f.id === id);
+          if (idx === -1) return state;
 
-          const formDetails =
-            loadFormsFromStorage().find((f) => f.id === id) || {};
-
+          const existing = state.forms[idx] || {};
           updatedForm = {
-            ...formDetails,
+            ...existing,
             ...form,
             updatedAt: new Date().toISOString(),
           };
 
-          const updatedForms = state.forms.map((f) =>
-            f.id === state.currentForm.id ? updatedForm : f
-          );
+          const updatedForms = [...state.forms];
+          updatedForms[idx] = updatedForm;
 
-          localStorage.setItem(FORMS_STORAGE_KEY, JSON.stringify(updatedForms));
+          try {
+            localStorage.setItem(
+              FORMS_STORAGE_KEY,
+              JSON.stringify(updatedForms)
+            );
+          } catch (error) {
+            console.error("Error saving updated forms:", error);
+          }
 
           return {
             forms: updatedForms,
@@ -261,36 +283,24 @@ const useFormStore = create(
         return { form: updatedForm, success: Boolean(updatedForm) };
       },
 
-      // // Publish form
-      // publishForm: () => {
-      //   set((state) => {
-      //     if (!state.currentForm) return state;
-
-      //     const updatedForm = {
-      //       ...state.currentForm,
-      //       isPublished: true,
-      //       publishedAt: new Date().toISOString(),
-      //       updatedAt: new Date().toISOString(),
-      //     };
-
-      //     const updatedForms = state.forms.map((f) =>
-      //       f.id === state.currentForm.id ? updatedForm : f
-      //     );
-
-      //     localStorage.setItem(FORMS_STORAGE_KEY, JSON.stringify(updatedForms));
-
-      //     return {
-      //       forms: updatedForms,
-      //       currentForm: updatedForm,
-      //     };
-      //   });
-      // },
-
       // Delete form
       deleteForm: (formId) => {
+        let deleted = false;
         set((state) => {
+          const exists = state.forms.some((f) => f.id === formId);
+          if (!exists) return state;
+
           const updatedForms = state.forms.filter((f) => f.id !== formId);
-          localStorage.setItem(FORMS_STORAGE_KEY, JSON.stringify(updatedForms));
+          try {
+            localStorage.setItem(
+              FORMS_STORAGE_KEY,
+              JSON.stringify(updatedForms)
+            );
+          } catch (error) {
+            console.error("Error saving forms after delete:", error);
+          }
+
+          deleted = true;
 
           return {
             forms: updatedForms,
@@ -298,6 +308,8 @@ const useFormStore = create(
               state.currentForm?.id === formId ? null : state.currentForm,
           };
         });
+
+        return { success: Boolean(deleted) };
       },
     }),
     {

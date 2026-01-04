@@ -2,12 +2,13 @@ import { useState } from "react";
 import { FiPlus, FiSearch } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import FormCard from "../components/FormCard.jsx";
+import FormCard from "../components/cards/FormCard.jsx";
 import useFormStore from "../services/formStorageService.jsx";
 import { ROUTE_LIST } from "../utils/routes.jsx";
+import AppButton from "../components/basics/AppButton.jsx";
 
 export default function Forms() {
-  const { forms } = useFormStore();
+  const { forms, deleteForm } = useFormStore();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -51,43 +52,38 @@ export default function Forms() {
     navigate(`${ROUTE_LIST.PREVIEW_FORM}/${id}`);
   };
 
-  const handleEdit = (form) => {
-    toast.info(
-      `Edit functionality for "${form.title}" would be implemented here`
-    );
+  const handleEdit = (id) => {
+    navigate(`${ROUTE_LIST.EDIT_FORM}/${id}`);
   };
 
-  const handleDelete = () => {
+  const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this form?")) {
-      toast.success("Form deleted successfully");
+      const response = deleteForm(id);
+      if (response.success) {
+        toast.success("Form deleted successfully");
+      } else {
+        toast.error("Error deleting form");
+      }
       // In real app, would call API to delete
     }
   };
 
-  const handleToggleStatus = () => {
-    toast.success("Form status updated successfully");
-    // In real app, would call API to toggle status
-  };
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flow-root space-y-3 md:flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Forms</h1>
           <p className="text-gray-600">Manage your published content</p>
         </div>
-        <button
-          onClick={() => navigate(ROUTE_LIST.CREATE_FORM)}
-          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 flex items-center space-x-2"
-        >
+        <AppButton onClick={() => navigate(ROUTE_LIST.CREATE_FORM)}>
           <FiPlus className="w-4 h-4" />
           <span>New Form</span>
-        </button>
+        </AppButton>
       </div>
 
       {/* Filters and Search */}
       <div className="bg-white rounded-lg shadow p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           {/* Search */}
           <div className="relative md:col-span-2">
             <FiSearch className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -120,13 +116,12 @@ export default function Forms() {
       {/* Forms Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredForms.map((form) => (
-          <div key={form.id} className="cursor-pointer">
+          <div key={form.id}>
             <FormCard
               form={form}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onPreview={handlePreview}
-              onToggleStatus={handleToggleStatus}
             />
           </div>
         ))}

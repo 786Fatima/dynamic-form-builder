@@ -1,27 +1,25 @@
 import { useNavigate, useParams } from "react-router-dom";
-import * as yup from "yup";
 import AppButton from "../components/basics/AppButton";
-import DynamicFormNewEditForm from "../components/forms/DynamicFormNewEditForm";
-import { FORM_INPUT_TYPES } from "../utils/constants";
+import CommonFormPreviewNewEditForm from "../components/forms/CommonFormPreviewNewEditForm";
 import { ROUTE_LIST } from "../utils/routes";
-// import AppPageTitle from "../breadcrumbs/AppPageTitle";
+import useFormStore from "../services/formStorageService";
+import Typography from "../components/basics/Typography";
 
-export default function DynamicFormNewEditPage() {
+export default function CommonFormPreviewNewEditPage() {
   const { formId } = useParams();
+  const { getFormById } = useFormStore();
   const navigate = useNavigate();
 
-  const isEdit = Boolean(formId);
+  const formData = getFormById(formId) || null;
 
   return (
     <div className="md:w-8/12 w-full mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            {isEdit ? "Edit Dynamic Form" : "Create Dynamic Form"}
-          </h2>
-          <p className="text-sm text-gray-500">
+          <Typography variant="h2">{`${formData.name} Form`}</Typography>
+          <Typography variant="body">
             Quickly design your form and add fields below.
-          </p>
+          </Typography>
         </div>
         <div className="hidden md:block">
           <AppButton
@@ -32,7 +30,7 @@ export default function DynamicFormNewEditPage() {
           </AppButton>
         </div>
       </div>
-      <DynamicFormNewEditForm />
+      <CommonFormPreviewNewEditForm />
     </div>
   );
 }
