@@ -21,7 +21,7 @@ const fieldSchema = yup.object().shape({
   key: yup.string().required(),
   placeholder: yup.string().optional(),
   required: yup.boolean().default(false),
-  defaultValue: yup.string().optional(),
+  defaultValue: yup.mixed().optional(),
   optionsString: yup.string(),
   options: yup
     .array()
@@ -227,6 +227,9 @@ export default function DynamicFormNewEditForm() {
                       label: capitalizeWords(type),
                       value: type,
                     }))}
+                    onBlur={() => {
+                      setValue(`fields[${index}].defaultValue`, "");
+                    }}
                     placeholder="Enter field type..."
                     errors={{
                       isError: errors?.fields?.[index]?.type,
@@ -262,16 +265,37 @@ export default function DynamicFormNewEditForm() {
                     }}
                     register={register}
                   />
-                  <FormInput
-                    name={`fields[${index}].defaultValue`}
-                    label="Default Value"
-                    placeholder="Enter default value..."
-                    errors={{
-                      isError: errors?.fields?.[index]?.defaultValue,
-                      message: errors?.fields?.[index]?.defaultValue?.message,
-                    }}
-                    register={register}
-                  />
+                  {field.type === FORM_INPUT_TYPES.SELECT &&
+                  field?.options?.length > 0 ? (
+                    <FormInput
+                      name={`fields[${index}].defaultValue`}
+                      label="Default Value"
+                      type="select"
+                      options={field.options}
+                      placeholder="Enter default value..."
+                      errors={{
+                        isError: errors?.fields?.[index]?.defaultValue,
+                        message: errors?.fields?.[index]?.defaultValue?.message,
+                      }}
+                      register={register}
+                    />
+                  ) : (
+                    <FormInput
+                      name={`fields[${index}].defaultValue`}
+                      label="Default Value"
+                      type={
+                        field.type == FORM_INPUT_TYPES.NUMBER
+                          ? "number"
+                          : "text"
+                      }
+                      placeholder="Enter default value..."
+                      errors={{
+                        isError: errors?.fields?.[index]?.defaultValue,
+                        message: errors?.fields?.[index]?.defaultValue?.message,
+                      }}
+                      register={register}
+                    />
+                  )}
                   <div className="col-span-2">
                     <FormInput
                       name={`fields[${index}].required`}

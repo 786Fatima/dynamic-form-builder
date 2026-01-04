@@ -10,10 +10,10 @@ export default function Dashboard() {
 
   const totalForms = forms.length;
   const totalFields = forms.reduce(
-    (acc, f) => acc + (f.fields?.length || 0),
+    (acc, form) => acc + (form.fields?.length || 0),
     0
   );
-  const publishedCount = forms.filter((f) => f.isPublished).length;
+  const publishedCount = forms.filter((form) => form.isPublished).length;
   const recentForms = [...forms]
     .sort((a, b) => {
       const ta = new Date(a.updatedAt || a.createdAt || 0).getTime();
@@ -71,24 +71,28 @@ export default function Dashboard() {
             </div>
           )}
 
-          {recentForms.map((f) => (
+          {recentForms.map((form) => (
             <div
-              key={f.id}
+              key={form.id}
               className="flow-root space-y-4 md:flex items-center justify-between p-3 border rounded"
             >
               <div>
                 <div className="text-sm font-medium text-gray-900">
-                  {f.name || "Untitled Form"}
+                  {form.name || "Untitled Form"}
                 </div>
                 <div className="text-xs text-gray-500">
-                  {f.fields?.length || 0} fields • Updated{" "}
-                  {f.updatedAt ? new Date(f.updatedAt).toLocaleString() : "—"}
+                  {form.fields?.length || 0} fields • Updated{" "}
+                  {form.updatedAt
+                    ? new Date(form.updatedAt).toLocaleString()
+                    : "—"}
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <AppButton
                   size="small"
-                  onClick={() => navigate(`${ROUTE_LIST.FORM_LIST}`)}
+                  onClick={() =>
+                    navigate(`${ROUTE_LIST.PREVIEW_FORM}/${form.id}`)
+                  }
                 >
                   Open
                 </AppButton>
